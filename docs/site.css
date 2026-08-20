@@ -497,6 +497,33 @@ a{ color: inherit; }
   z-index: 5;
 }
 .modal-close:hover{ background:#fff; }
+
+/* Close button at the bottom of the article (helps on mobile after long reads) */
+.modal-bottom-actions{
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px dashed var(--line);
+}
+.modal-close-bottom{
+  padding: 12px 28px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  color: var(--ink);
+  font: 500 14px var(--font-body);
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.modal-close-bottom:hover{
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
 .modal-cover{
   width:100%; aspect-ratio: 16/7;
   object-fit:cover;
@@ -1075,6 +1102,12 @@ a{ color: inherit; }
 .ae-toolbar button:hover{
   background: color-mix(in oklab, var(--bg-2), var(--paper) 40%);
   border-color: var(--line);
+}
+.ae-toolbar button.ae-tbtn.is-on{
+  background: color-mix(in oklab, var(--accent), transparent 82%);
+  border-color: color-mix(in oklab, var(--accent), var(--line) 40%);
+  color: var(--accent);
+  font-weight: 700;
 }
 .ae-toolbar .divider{
   width: 1px; background: var(--line); margin: 2px 6px;

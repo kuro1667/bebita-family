@@ -213,6 +213,11 @@ function ArticleModal({ articleId, onClose, onTag }){
               </div>
             )}
             <MarkdownView source={data.body} />
+            <div className="modal-bottom-actions">
+              <button className="modal-close-bottom" onClick={onClose}>
+                ↑ 閉じる
+              </button>
+            </div>
           </div>
         </>}
       </div>
