@@ -174,7 +174,7 @@ function ArticleModal({ articleId, onClose, onTag }){
   useEffect(()=>{
     setLoading(true);
     setError(null);
-    fetch(`articles/${articleId}.md`)
+    fetch(`articles/${articleId}.md`, { cache: 'no-cache' })
       .then(r => r.ok ? r.text() : Promise.reject(new Error('記事が見つかりません')))
       .then(text => {
         const { meta, body } = parseFrontmatter(text);
@@ -242,8 +242,8 @@ function Viewer(){
   // load initial data
   useEffect(()=>{
     Promise.all([
-      fetch('site-config.json').then(r => r.ok ? r.json() : Promise.reject(new Error('site-config.json'))),
-      fetch('articles/index.json').then(r => r.ok ? r.json() : Promise.reject(new Error('articles/index.json'))),
+      fetch('site-config.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('site-config.json'))),
+      fetch('articles/index.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('articles/index.json'))),
     ]).then(([cfg, idx])=>{
       setConfig(cfg);
       setArticles(idx.articles || []);
