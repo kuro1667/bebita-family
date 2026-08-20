@@ -1,0 +1,32 @@
+# ─────────────────────────────────────────────────────────
+# bebita_family — GitHub には上げないファイル / フォルダ
+# ─────────────────────────────────────────────────────────
+
+# ローカル専用エディタ(自分のPCでだけ使う)
+editor/
+*.srcmap.json
+
+# エディタのソース(ビルド元、pushしない)
+tweaks_panel.jsx
+icons.jsx
+markdown.jsx
+editor.jsx
+editor-app.jsx
+tweak-sections.jsx
+fs-bridge.jsx
+editor.css
+
+# ドキュメント(GitHub Pages の公開対象外)
+README.md
+setup.md
+
+# OS / エディタが作るゴミ
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
+
+# デザインツールが作る一時ファイル
+scraps/
+screenshots/
