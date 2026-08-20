@@ -7,14 +7,15 @@ editor/
 *.srcmap.json
 
 # エディタのソース(ビルド元、pushしない)
-tweaks_panel.jsx
-icons.jsx
-markdown.jsx
-editor.jsx
-editor-app.jsx
-tweak-sections.jsx
-fs-bridge.jsx
-editor.css
+# ※ ルート直下のみ除外。docs/ 内の同名ファイルは公開に必要なので除外しない
+/tweaks_panel.jsx
+/icons.jsx
+/markdown.jsx
+/editor.jsx
+/editor-app.jsx
+/tweak-sections.jsx
+/fs-bridge.jsx
+/editor.css
 
 # ドキュメント(GitHub Pages の公開対象外)
 README.md
