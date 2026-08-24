@@ -256,9 +256,9 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
   }, [onClose]);
 
   // Scroll modal to top on article change
-  const modalRef = useRef(null);
+  const backdropRef = useRef(null);
   useEffect(()=>{
-    if (modalRef.current) modalRef.current.scrollTop = 0;
+    if (backdropRef.current) backdropRef.current.scrollTop = 0;
   }, [articleId]);
 
   // Prev / next
@@ -294,8 +294,8 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
 
   return (
     <>
-      <div className="modal-backdrop" onClick={onClose}>
-        <div className="modal" onClick={e=>e.stopPropagation()} ref={modalRef}>
+      <div className="modal-backdrop" onClick={onClose} ref={backdropRef}>
+        <div className="modal" onClick={e=>e.stopPropagation()}>
           <button className="share-button" onClick={share} title="この記事のURLを共有" aria-label="share">↗</button>
           <button className="modal-close" onClick={onClose} aria-label="閉じる">✕</button>
           {loading && <div className="modal-inner"><div className="viewer-loading">読み込み中…</div></div>}
@@ -335,10 +335,10 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
                           e.preventDefault();
                           const el = document.getElementById(`h-${h.id}`);
                           if (el){
-                            const modal = modalRef.current;
-                            if (modal){
-                              const y = el.getBoundingClientRect().top - modal.getBoundingClientRect().top + modal.scrollTop - 20;
-                              modal.scrollTo({top: y, behavior: 'smooth'});
+                            const scroller = backdropRef.current;
+                            if (scroller){
+                              const y = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top + scroller.scrollTop - 20;
+                              scroller.scrollTo({top: y, behavior: 'smooth'});
                             }
                           }
                         }}>{h.text}</a>
