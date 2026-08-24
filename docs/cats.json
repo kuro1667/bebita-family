@@ -9,7 +9,40 @@
       "age": "13",
       "origin": "拾い猫",
       "bio": "",
-      "photo": ""
+      "photo": "images/めい.webp"
+    },
+    {
+      "id": "g9f5aqe",
+      "name": "たぷ",
+      "tagline": "",
+      "species": "マンチカン",
+      "gender": "おとこの子",
+      "age": "10",
+      "origin": "ペットショップ",
+      "bio": "",
+      "photo": "images/たぷ.webp"
+    },
+    {
+      "id": "sd5jek6",
+      "name": "まっち",
+      "tagline": "暴れん坊将軍",
+      "species": "ゴールデンハムスター",
+      "gender": "おんなの子",
+      "age": "1",
+      "origin": "ペットショップ",
+      "bio": "",
+      "photo": "images/まっち.webp"
+    },
+    {
+      "id": "z2hqqhu",
+      "name": "びび",
+      "tagline": "遊び大好き",
+      "species": "ラガマフィン",
+      "gender": "おとこの子",
+      "age": "1",
+      "origin": "ペットショップ",
+      "bio": "",
+      "photo": "images/びび.webp"
     }
   ]
 }

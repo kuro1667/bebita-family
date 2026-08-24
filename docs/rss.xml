@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-<title>bebita_family</title>
-<description>bebita_family — 猫たちの日々の記録</description>
-<link>./</link>
-<language>ja</language>
+  <title>メビタふぁみりー</title>
+  <description>猫3匹＋ハムスターのにぎやか日常</description>
+  <link>./</link>
+  <language>ja</language>
+  <lastBuildDate>Mon, 24 Aug 2026 06:05:28 GMT</lastBuildDate>
+  <item>
+    <title>はじめまして！</title>
+    <link>./#a=2026-08-20-untitled-6ps7</link>
+    <guid isPermaLink="false">2026-08-20-untitled-6ps7</guid>
+    <pubDate>Thu, 20 Aug 2026 00:00:00 GMT</pubDate>
+    <description>はじめまして、メビタふぁみりーです🐾 猫たちやハムスターの可愛さをみんなと共有したくて、このブログを始めました。病気と向き合っている子のことも、記録として残していけたらいいなと思っています。のんびり更新していくので、よかったらお付き合いください😊 🐱 めい うちの古株、三毛猫のめいです。もともとは拾い猫さんで、そんなご縁で家族になりました。ちょっぴり神経質だけど、マイペースでおっとりしていて、一人の時間が大好き。今は腎臓病と向き合いながら、毎日ゆったり過ごしています。めいの日々もここで記録していけたらと思っています。 🐱 タプ うちで一番小さいマンチカン、タプです。ペットショップで売れ…</description>
+  </item>
 </channel>
 </rss>

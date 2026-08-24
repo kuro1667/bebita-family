@@ -193,19 +193,22 @@ function SNSCard({ item }){
 
 // ── Article card ──────────────────────────────────────────
 function ArticleCard({ item, onOpen, onTag, catsById }){
-  const cat = item.cat && catsById[item.cat];
+  const catIds = Array.isArray(item.cats) && item.cats.length ? item.cats : (item.cat ? [item.cat] : []);
+  const cats = catIds.map(id => catsById[id]).filter(Boolean);
   return (
     <button className="article-card" onClick={()=>onOpen(item.id)}>
-      {item.cover && <img className="article-thumb" src={item.cover} alt="" loading="lazy" />}
+      {item.cover && item.cover.trim() && <img className="article-thumb" src={item.cover} alt="" loading="lazy" />}
       <div className="article-body">
         <div className="article-date"><span>{formatDate(item.date)}</span></div>
         <div className="article-title">{item.title || '(無題)'}</div>
-        {cat && (
-          <div style={{marginBottom:6}}>
-            <span className="article-cat-badge">
-              {cat.photo ? <img src={cat.photo} alt=""/> : null}
-              <span className="badge-name">🐾 {cat.name}</span>
-            </span>
+        {cats.length > 0 && (
+          <div style={{marginBottom:6, display:'flex', gap:4, flexWrap:'wrap'}}>
+            {cats.map(c => (
+              <span key={c.id} className="article-cat-badge">
+                {c.photo ? <img src={c.photo} alt=""/> : null}
+                <span className="badge-name">🐾 {c.name}</span>
+              </span>
+            ))}
           </div>
         )}
         <div className="article-excerpt">{item.excerpt || ''}</div>
@@ -283,7 +286,11 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
   const headings = useMemo(()=> data ? extractHeadings(data.body) : [], [data]);
   const showToc = headings.length >= 2;
 
-  const cat = data?.meta?.cat && catsById[data.meta.cat];
+  const catIds = data?.meta ?
+    (Array.isArray(data.meta.cats) && data.meta.cats.length ? data.meta.cats
+     : (data.meta.cat ? [data.meta.cat] : []))
+    : [];
+  const relatedCats = catIds.map(id => catsById[id]).filter(Boolean);
 
   return (
     <>
@@ -294,17 +301,20 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
           {loading && <div className="modal-inner"><div className="viewer-loading">読み込み中…</div></div>}
           {error && <div className="modal-inner"><div style={{color:'#a33', padding:20}}>{error}</div></div>}
           {data && <>
-            {data.meta.cover && <img className="modal-cover" src={data.meta.cover} alt="" />}
+            {data.meta.cover && String(data.meta.cover).trim() && <img className="modal-cover" src={data.meta.cover} alt="" />}
             <div className="modal-inner">
               <div className="modal-date">{formatDate(data.meta.date)}</div>
               <h1 className="modal-title">{data.meta.title}</h1>
-              {cat && (
-                <div style={{marginBottom:12}}>
-                  <button className="article-cat-badge" style={{cursor:'pointer', border:'1px solid color-mix(in oklab, var(--accent), var(--line) 60%)'}}
-                    onClick={()=>onOpen && onOpen({ page:'cats', cat: cat.id, article:'' })}>
-                    {cat.photo ? <img src={cat.photo} alt=""/> : null}
-                    <span className="badge-name">🐾 {cat.name} のこと</span>
-                  </button>
+              {relatedCats.length > 0 && (
+                <div style={{marginBottom:12, display:'flex', gap:6, flexWrap:'wrap'}}>
+                  {relatedCats.map(c => (
+                    <button key={c.id} className="article-cat-badge"
+                      style={{cursor:'pointer', border:'1px solid color-mix(in oklab, var(--accent), var(--line) 60%)'}}
+                      onClick={()=>onOpen && onOpen({ page:'cats', cat: c.id, article:'' })}>
+                      {c.photo ? <img src={c.photo} alt=""/> : null}
+                      <span className="badge-name">🐾 {c.name} のこと</span>
+                    </button>
+                  ))}
                 </div>
               )}
               {Array.isArray(data.meta.tags) && data.meta.tags.length > 0 && (
@@ -391,7 +401,11 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
 
   if (cat){
     // Cat detail page
-    const catArticles = sortByDateDesc(articles.filter(a => !a.draft && a.cat === cat.id));
+    const matchesCat = (a) => {
+      if (Array.isArray(a.cats) && a.cats.length) return a.cats.includes(cat.id);
+      return a.cat === cat.id;
+    };
+    const catArticles = sortByDateDesc(articles.filter(a => !a.draft && matchesCat(a)));
     return (
       <div className="shell">
         <div className="cat-hero">
@@ -431,7 +445,11 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
   // Cats index
   const withCounts = cats.map(c => ({
     ...c,
-    count: articles.filter(a => !a.draft && a.cat === c.id).length,
+    count: articles.filter(a => {
+      if (a.draft) return false;
+      if (Array.isArray(a.cats) && a.cats.length) return a.cats.includes(c.id);
+      return a.cat === c.id;
+    }).length,
   }));
   return (
     <div className="shell">
@@ -720,18 +738,25 @@ function Viewer(){
           <main className="col-right">
             {showHero && (
               <section className="hero">
-                {latest.cover && <img className="hero-cover" src={latest.cover} alt="" />}
+                {latest.cover && latest.cover.trim() && <img className="hero-cover" src={latest.cover} alt="" />}
                 <span className="hero-kicker">最新の投稿</span>
                 <h1 className="hero-title">{latest.title}</h1>
                 <div className="hero-date">{formatDate(latest.date)}</div>
-                {latest.cat && catsById[latest.cat] && (
-                  <div style={{marginTop:8}}>
-                    <span className="article-cat-badge">
-                      {catsById[latest.cat].photo ? <img src={catsById[latest.cat].photo} alt=""/> : null}
-                      <span className="badge-name">🐾 {catsById[latest.cat].name}</span>
-                    </span>
-                  </div>
-                )}
+                {(() => {
+                  const ids = Array.isArray(latest.cats) && latest.cats.length ? latest.cats : (latest.cat ? [latest.cat] : []);
+                  const shown = ids.map(id => catsById[id]).filter(Boolean);
+                  if (!shown.length) return null;
+                  return (
+                    <div style={{marginTop:8, display:'flex', gap:6, flexWrap:'wrap'}}>
+                      {shown.map(c => (
+                        <span key={c.id} className="article-cat-badge">
+                          {c.photo ? <img src={c.photo} alt=""/> : null}
+                          <span className="badge-name">🐾 {c.name}</span>
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })()}
                 {Array.isArray(latest.tags) && latest.tags.length > 0 && (
                   <div className="hero-tags">
                     {latest.tags.map(tg => <span key={tg} className="tag-chip tag-clickable" onClick={()=>setTag(tg)}>#{tg}</span>)}
