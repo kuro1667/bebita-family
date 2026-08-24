@@ -197,7 +197,7 @@ function ArticleCard({ item, onOpen, onTag, catsById }){
   const cats = catIds.map(id => catsById[id]).filter(Boolean);
   return (
     <button className="article-card" onClick={()=>onOpen(item.id)}>
-      {item.cover && item.cover.trim() && <img className="article-thumb" src={item.cover} alt="" loading="lazy" />}
+      {item.cover && item.cover.trim() && <img className="article-thumb" src={encodeURI(item.cover)} alt="" loading="lazy" />}
       <div className="article-body">
         <div className="article-date"><span>{formatDate(item.date)}</span></div>
         <div className="article-title">{item.title || '(無題)'}</div>
@@ -205,7 +205,7 @@ function ArticleCard({ item, onOpen, onTag, catsById }){
           <div style={{marginBottom:6, display:'flex', gap:4, flexWrap:'wrap'}}>
             {cats.map(c => (
               <span key={c.id} className="article-cat-badge">
-                {c.photo ? <img src={c.photo} alt=""/> : null}
+                {c.photo ? <img src={encodeURI(c.photo)} alt=""/> : null}
                 <span className="badge-name">🐾 {c.name}</span>
               </span>
             ))}
@@ -301,7 +301,7 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
           {loading && <div className="modal-inner"><div className="viewer-loading">読み込み中…</div></div>}
           {error && <div className="modal-inner"><div style={{color:'#a33', padding:20}}>{error}</div></div>}
           {data && <>
-            {data.meta.cover && String(data.meta.cover).trim() && <img className="modal-cover" src={data.meta.cover} alt="" />}
+            {data.meta.cover && String(data.meta.cover).trim() && <img className="modal-cover" src={encodeURI(data.meta.cover)} alt="" />}
             <div className="modal-inner">
               <div className="modal-date">{formatDate(data.meta.date)}</div>
               <h1 className="modal-title">{data.meta.title}</h1>
@@ -311,7 +311,7 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
                     <button key={c.id} className="article-cat-badge"
                       style={{cursor:'pointer', border:'1px solid color-mix(in oklab, var(--accent), var(--line) 60%)'}}
                       onClick={()=>onOpen && onOpen({ page:'cats', cat: c.id, article:'' })}>
-                      {c.photo ? <img src={c.photo} alt=""/> : null}
+                      {c.photo ? <img src={encodeURI(c.photo)} alt=""/> : null}
                       <span className="badge-name">🐾 {c.name} のこと</span>
                     </button>
                   ))}
@@ -410,7 +410,7 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
       <div className="shell">
         <div className="cat-hero">
           {cat.photo
-            ? <img className="cat-hero-photo" src={cat.photo} alt={cat.name} />
+            ? <img className="cat-hero-photo" src={encodeURI(cat.photo)} alt={cat.name} />
             : <div className="cat-hero-photo-placeholder">{(cat.name||'?').slice(0,2)}</div>}
           <h1 className="cat-hero-name">{cat.name}</h1>
           {cat.tagline && <p className="cat-hero-tagline">{cat.tagline}</p>}
@@ -468,7 +468,7 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
           {withCounts.map(c => (
             <button key={c.id} className="cat-card" onClick={()=>onSelectCat(c.id)}>
               {c.photo
-                ? <img className="cat-card-photo" src={c.photo} alt={c.name}/>
+                ? <img className="cat-card-photo" src={encodeURI(c.photo)} alt={c.name} loading="lazy" onError={(e)=>{e.target.style.display='none'; e.target.nextSibling && (e.target.nextSibling.style.display='');}}/>
                 : <div className="cat-card-placeholder">{(c.name||'?').slice(0,2)}</div>}
               <div className="cat-card-name">{c.name}</div>
               {c.tagline && <div className="cat-card-tagline">{c.tagline}</div>}
@@ -686,7 +686,7 @@ function Viewer(){
             <div className="profile">
               <div className="avatar">
                 {t.avatarUrl
-                  ? <img src={t.avatarUrl} alt="" />
+                  ? <img src={encodeURI(t.avatarUrl)} alt="" />
                   : <span>{(t.name||'?').trim().slice(0,2)}</span>}
               </div>
               <div className="name">{t.name}</div>
@@ -738,7 +738,7 @@ function Viewer(){
           <main className="col-right">
             {showHero && (
               <section className="hero">
-                {latest.cover && latest.cover.trim() && <img className="hero-cover" src={latest.cover} alt="" />}
+                {latest.cover && latest.cover.trim() && <img className="hero-cover" src={encodeURI(latest.cover)} alt="" />}
                 <span className="hero-kicker">最新の投稿</span>
                 <h1 className="hero-title">{latest.title}</h1>
                 <div className="hero-date">{formatDate(latest.date)}</div>
@@ -750,7 +750,7 @@ function Viewer(){
                     <div style={{marginTop:8, display:'flex', gap:6, flexWrap:'wrap'}}>
                       {shown.map(c => (
                         <span key={c.id} className="article-cat-badge">
-                          {c.photo ? <img src={c.photo} alt=""/> : null}
+                          {c.photo ? <img src={encodeURI(c.photo)} alt=""/> : null}
                           <span className="badge-name">🐾 {c.name}</span>
                         </span>
                       ))}
