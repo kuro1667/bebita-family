@@ -431,7 +431,7 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
           <div className="section">
             <div className="section-head">
               <h2 className="section-title">{cat.name}の記事</h2>
-              <span className="section-count">{catArticles.length.toString().padStart(2,'0')}</span>
+              <span className="section-count">{catArticles.length}</span>
             </div>
             <div className="articles">
               {catArticles.map(a => <ArticleCard key={a.id} item={a} onOpen={onOpenArticle} onTag={onTag} catsById={catsById}/>)}
@@ -699,7 +699,7 @@ function Viewer(){
               <div className="section">
                 <div className="section-head">
                   <h2 className="section-title">リンク</h2>
-                  <span className="section-count">{(t.sns||[]).length.toString().padStart(2,'0')}</span>
+                  <span className="section-count">{(t.sns||[]).length}</span>
                 </div>
                 <div className="sns-list">
                   {(t.sns||[]).map(s => <SNSCard key={s.id} item={s} />)}
@@ -805,7 +805,7 @@ function Viewer(){
                   <h2 className="section-title">
                     {hashState.tag ? `#${hashState.tag} の記事` : (hashState.q ? '検索結果' : 'これまでの日記')}
                   </h2>
-                  <span className="section-count">{visible.length.toString().padStart(2,'0')}</span>
+                  <span className="section-count">{visible.length}</span>
                 </div>
                 <div className="articles">
                   {listItems.map(a => <ArticleCard key={a.id} item={a} onOpen={openArticle} onTag={setTag} catsById={catsById}/>)}
