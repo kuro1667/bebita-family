@@ -1,22 +1,16 @@
-// bebita_family — 公開ビューア (v2 データ構造対応)
+// bebita_family — 公開ビューア v3
 //
-// データ構造:
-//   articles/index.json  ... 記事一覧のメタ情報
-//   articles/<id>.md     ... 個別記事の本文(frontmatter付きMarkdown)
-//
-// ページネーション・タグフィルタ・検索対応。
+// 機能:
+//   ・ホーム(記事一覧・タグ絞り込み・検索・ページネーション)
+//   ・記事詳細(モーダル、目次自動生成、前後ナビ、共有ボタン)
+//   ・猫プロフィールページ(#page=cats, #cat=<id>)
+//   ・ダークモード(端末追従 + 手動切替)
+//   ・キャッシュ制御(記事更新を確実に反映)
+//   ・URLハッシュで状態管理
 
-const { useState, useMemo, useEffect, useCallback } = React;
+const { useState, useMemo, useEffect, useCallback, useRef } = React;
 
-// ── frontmatter パース ─────────────────────────────────────
-// ---
-// title: ...
-// date: 2026-08-20
-// tags: [日記, 猫]
-// cover: images/xxx.jpg
-// draft: false
-// ---
-// (本文)
+// ── frontmatter パース ────────────────────────────────────
 function parseFrontmatter(src){
   if (!src) return { meta: {}, body: '' };
   const m = src.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
@@ -27,9 +21,8 @@ function parseFrontmatter(src){
     if (!kv) continue;
     const key = kv[1].trim();
     let val = kv[2].trim();
-    // simple types
     if (/^\[.*\]$/.test(val)){
-      val = val.slice(1,-1).split(',').map(s => s.trim()).filter(Boolean);
+      val = val.slice(1,-1).split(',').map(s => s.trim().replace(/^["']|["']$/g,'')).filter(Boolean);
     } else if (val === 'true') val = true;
     else if (val === 'false') val = false;
     else if (/^-?\d+(\.\d+)?$/.test(val)) val = parseFloat(val);
@@ -52,8 +45,14 @@ function formatDate(iso){
 function sortByDateDesc(list){
   return [...list].sort((a,b)=> (b.date||'').localeCompare(a.date||''));
 }
+function slugify(text){
+  return String(text||'').toLowerCase()
+    .replace(/[\s\u3000]+/g,'-')
+    .replace(/[^\w\-\u3040-\u30ff\u4e00-\u9fff]/g,'')
+    .replace(/-+/g,'-').replace(/^-|-$/g,'');
+}
 
-// theme apply
+// ── theme ────────────────────────────────────────────────
 const BG_PATTERNS_VIEW = {
   'なし': 'none',
   'ドット (小)': 'radial-gradient(color-mix(in oklab, var(--ink), transparent 92%) 1px, transparent 1px)',
@@ -83,18 +82,12 @@ function applyAvatarVars(cfg){
 function applyTheme(theme){
   if (!theme) return;
   const root = document.documentElement;
-  if (theme.bg)          root.style.setProperty('--bg', theme.bg);
-  if (theme.bg2)         root.style.setProperty('--bg-2', theme.bg2);
-  if (theme.paper)       root.style.setProperty('--paper', theme.paper);
-  if (theme.ink)         root.style.setProperty('--ink', theme.ink);
-  if (theme.inkSoft)     root.style.setProperty('--ink-soft', theme.inkSoft);
-  if (theme.inkMute)     root.style.setProperty('--ink-mute', theme.inkMute);
-  if (theme.line)        root.style.setProperty('--line', theme.line);
-  if (theme.accent)      root.style.setProperty('--accent', theme.accent);
-  if (theme.accent2)     root.style.setProperty('--accent-2', theme.accent2);
-  if (theme.accentInk)   root.style.setProperty('--accent-ink', theme.accentInk);
-  if (theme.fontHeading) root.style.setProperty('--font-heading', theme.fontHeading);
-  if (theme.fontBody)    root.style.setProperty('--font-body', theme.fontBody);
+  const s = (k,v) => v && root.style.setProperty(k, v);
+  s('--bg', theme.bg); s('--bg-2', theme.bg2); s('--paper', theme.paper);
+  s('--ink', theme.ink); s('--ink-soft', theme.inkSoft); s('--ink-mute', theme.inkMute);
+  s('--line', theme.line); s('--accent', theme.accent); s('--accent-2', theme.accent2);
+  s('--accent-ink', theme.accentInk);
+  s('--font-heading', theme.fontHeading); s('--font-body', theme.fontBody);
   const key = theme.bgPattern || 'なし';
   root.style.setProperty('--bg-pattern', BG_PATTERNS_VIEW[key] || 'none');
   document.body.style.backgroundSize = BG_SIZES_VIEW[key] || '';
@@ -103,29 +96,84 @@ function applyTheme(theme){
 // ── URL state (hash-based) ────────────────────────────────
 function parseHashState(){
   const raw = (location.hash || '').replace(/^#/, '');
-  const state = { tag: '', q: '', page: 1, article: '' };
+  const state = { page: 'home', tag: '', q: '', pageNum: 1, article: '', cat: '' };
   if (!raw) return state;
   for (const p of raw.split('&')){
     const [k, v] = p.split('=').map(decodeURIComponent);
-    if (k === 'tag')       state.tag = v || '';
+    if (k === 'page' && (v === 'cats' || v === 'home')) state.page = v;
+    else if (k === 'tag')  state.tag = v || '';
     else if (k === 'q')    state.q = v || '';
-    else if (k === 'page') state.page = Math.max(1, parseInt(v, 10) || 1);
+    else if (k === 'p')    state.pageNum = Math.max(1, parseInt(v, 10) || 1);
     else if (k === 'a')    state.article = v || '';
+    else if (k === 'cat')  state.cat = v || '';
   }
   return state;
 }
 function setHashState(s){
   const parts = [];
+  if (s.page && s.page !== 'home') parts.push('page='+encodeURIComponent(s.page));
   if (s.tag)     parts.push('tag='+encodeURIComponent(s.tag));
   if (s.q)       parts.push('q='+encodeURIComponent(s.q));
-  if (s.page>1)  parts.push('page='+s.page);
+  if (s.pageNum>1)  parts.push('p='+s.pageNum);
   if (s.article) parts.push('a='+encodeURIComponent(s.article));
+  if (s.cat)     parts.push('cat='+encodeURIComponent(s.cat));
+  const next = parts.join('&');
+  const url = next ? ('#'+next) : location.pathname + location.search;
+  history.pushState(null, '', url);
+}
+function replaceHashState(s){
+  const parts = [];
+  if (s.page && s.page !== 'home') parts.push('page='+encodeURIComponent(s.page));
+  if (s.tag)     parts.push('tag='+encodeURIComponent(s.tag));
+  if (s.q)       parts.push('q='+encodeURIComponent(s.q));
+  if (s.pageNum>1)  parts.push('p='+s.pageNum);
+  if (s.article) parts.push('a='+encodeURIComponent(s.article));
+  if (s.cat)     parts.push('cat='+encodeURIComponent(s.cat));
   const next = parts.join('&');
   const url = next ? ('#'+next) : location.pathname + location.search;
   history.replaceState(null, '', url);
 }
 
 const PER_PAGE = 12;
+const THEME_KEY = 'bebita_theme_preference';
+
+// ── Theme toggle ─────────────────────────────────────────
+function useTheme(){
+  const [mode, setMode] = useState(() => {
+    try { return localStorage.getItem(THEME_KEY) || 'auto'; }
+    catch(e){ return 'auto'; }
+  });
+  useEffect(()=>{
+    const root = document.documentElement;
+    if (mode === 'light') root.setAttribute('data-theme', 'light');
+    else if (mode === 'dark') root.setAttribute('data-theme', 'dark');
+    else root.removeAttribute('data-theme');
+    try { localStorage.setItem(THEME_KEY, mode); } catch(e){}
+  }, [mode]);
+  const cycle = useCallback(() => {
+    setMode(m => m === 'auto' ? 'light' : m === 'light' ? 'dark' : 'auto');
+  }, []);
+  return [mode, cycle];
+}
+
+// ── Table of contents extraction ─────────────────────────
+function extractHeadings(md){
+  if (!md) return [];
+  const lines = String(md).split(/\r?\n/);
+  const headings = [];
+  let inCode = false;
+  for (const line of lines){
+    if (/^```/.test(line)){ inCode = !inCode; continue; }
+    if (inCode) continue;
+    const m = line.match(/^(#{1,3})\s+(.+)$/);
+    if (m){
+      const level = m[1].length;
+      const text = m[2].trim();
+      headings.push({ level, text, id: slugify(text) || 'h'+headings.length });
+    }
+  }
+  return headings;
+}
 
 // ── SNS card ──────────────────────────────────────────────
 function SNSCard({ item }){
@@ -144,13 +192,22 @@ function SNSCard({ item }){
 }
 
 // ── Article card ──────────────────────────────────────────
-function ArticleCard({ item, onOpen, onTag }){
+function ArticleCard({ item, onOpen, onTag, catsById }){
+  const cat = item.cat && catsById[item.cat];
   return (
     <button className="article-card" onClick={()=>onOpen(item.id)}>
-      {item.cover && <img className="article-thumb" src={item.cover} alt="" />}
+      {item.cover && <img className="article-thumb" src={item.cover} alt="" loading="lazy" />}
       <div className="article-body">
         <div className="article-date"><span>{formatDate(item.date)}</span></div>
         <div className="article-title">{item.title || '(無題)'}</div>
+        {cat && (
+          <div style={{marginBottom:6}}>
+            <span className="article-cat-badge">
+              {cat.photo ? <img src={cat.photo} alt=""/> : null}
+              <span className="badge-name">🐾 {cat.name}</span>
+            </span>
+          </div>
+        )}
         <div className="article-excerpt">{item.excerpt || ''}</div>
         {item.tags?.length > 0 && (
           <div className="article-tags">
@@ -165,11 +222,12 @@ function ArticleCard({ item, onOpen, onTag }){
   );
 }
 
-// ── Article modal (fetches body on demand) ────────────────
-function ArticleModal({ articleId, onClose, onTag }){
+// ── Article modal ─────────────────────────────────────────
+function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen }){
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(()=>{
     setLoading(true);
@@ -194,33 +252,213 @@ function ArticleModal({ articleId, onClose, onTag }){
     };
   }, [onClose]);
 
+  // Scroll modal to top on article change
+  const modalRef = useRef(null);
+  useEffect(()=>{
+    if (modalRef.current) modalRef.current.scrollTop = 0;
+  }, [articleId]);
+
+  // Prev / next
+  const sortedPub = useMemo(()=> sortByDateDesc((allArticles||[]).filter(a=>!a.draft)), [allArticles]);
+  const currentIdx = sortedPub.findIndex(a => a.id === articleId);
+  const prevArticle = currentIdx > 0 ? sortedPub[currentIdx - 1] : null;
+  const nextArticle = currentIdx >= 0 && currentIdx < sortedPub.length - 1 ? sortedPub[currentIdx + 1] : null;
+
+  const share = async () => {
+    const url = location.origin + location.pathname + location.search + `#a=${encodeURIComponent(articleId)}`;
+    const title = data?.meta?.title || 'bebita_family';
+    if (navigator.share){
+      try { await navigator.share({ title, url }); return; } catch(e){}
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShowToast(true);
+      setTimeout(()=>setShowToast(false), 2500);
+    } catch(e){
+      prompt('この記事のURL:', url);
+    }
+  };
+
+  // TOC (only show if 2+ headings)
+  const headings = useMemo(()=> data ? extractHeadings(data.body) : [], [data]);
+  const showToc = headings.length >= 2;
+
+  const cat = data?.meta?.cat && catsById[data.meta.cat];
+
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" onClick={e=>e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="閉じる">✕</button>
-        {loading && <div className="modal-inner"><div style={{color:'var(--ink-mute)', padding:20, textAlign:'center'}}>読み込み中…</div></div>}
-        {error && <div className="modal-inner"><div style={{color:'#a33', padding:20}}>{error}</div></div>}
-        {data && <>
-          {data.meta.cover && <img className="modal-cover" src={data.meta.cover} alt="" />}
-          <div className="modal-inner">
-            <div className="modal-date">{formatDate(data.meta.date)}</div>
-            <h1 className="modal-title">{data.meta.title}</h1>
-            {Array.isArray(data.meta.tags) && data.meta.tags.length > 0 && (
-              <div style={{display:'flex', gap:6, flexWrap:'wrap', marginBottom:16}}>
-                {data.meta.tags.map(t =>
-                  <span key={t} className="tag-chip tag-clickable" onClick={() => { onTag(t); onClose(); }}>#{t}</span>
-                )}
+    <>
+      <div className="modal-backdrop" onClick={onClose}>
+        <div className="modal" onClick={e=>e.stopPropagation()} ref={modalRef}>
+          <button className="share-button" onClick={share} title="この記事のURLを共有" aria-label="share">↗</button>
+          <button className="modal-close" onClick={onClose} aria-label="閉じる">✕</button>
+          {loading && <div className="modal-inner"><div className="viewer-loading">読み込み中…</div></div>}
+          {error && <div className="modal-inner"><div style={{color:'#a33', padding:20}}>{error}</div></div>}
+          {data && <>
+            {data.meta.cover && <img className="modal-cover" src={data.meta.cover} alt="" />}
+            <div className="modal-inner">
+              <div className="modal-date">{formatDate(data.meta.date)}</div>
+              <h1 className="modal-title">{data.meta.title}</h1>
+              {cat && (
+                <div style={{marginBottom:12}}>
+                  <button className="article-cat-badge" style={{cursor:'pointer', border:'1px solid color-mix(in oklab, var(--accent), var(--line) 60%)'}}
+                    onClick={()=>onOpen && onOpen({ page:'cats', cat: cat.id, article:'' })}>
+                    {cat.photo ? <img src={cat.photo} alt=""/> : null}
+                    <span className="badge-name">🐾 {cat.name} のこと</span>
+                  </button>
+                </div>
+              )}
+              {Array.isArray(data.meta.tags) && data.meta.tags.length > 0 && (
+                <div style={{display:'flex', gap:6, flexWrap:'wrap', marginBottom:16}}>
+                  {data.meta.tags.map(t =>
+                    <span key={t} className="tag-chip tag-clickable" onClick={() => { onTag(t); onClose(); }}>#{t}</span>
+                  )}
+                </div>
+              )}
+
+              {showToc && data.meta.toc !== false && (
+                <div className="md-toc">
+                  <div className="md-toc-title">目次</div>
+                  <ol>
+                    {headings.filter(h => h.level <= 3).map((h, i) => (
+                      <li key={i} className={'toc-h'+h.level}>
+                        <a href={`#h-${h.id}`} onClick={(e)=>{
+                          e.preventDefault();
+                          const el = document.getElementById(`h-${h.id}`);
+                          if (el){
+                            const modal = modalRef.current;
+                            if (modal){
+                              const y = el.getBoundingClientRect().top - modal.getBoundingClientRect().top + modal.scrollTop - 20;
+                              modal.scrollTo({top: y, behavior: 'smooth'});
+                            }
+                          }
+                        }}>{h.text}</a>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              <MarkdownArticleView source={data.body} headings={headings} />
+
+              <div className="modal-bottom-actions">
+                <button className="modal-close-bottom" onClick={onClose}>↑ 閉じる</button>
               </div>
-            )}
-            <MarkdownView source={data.body} />
-            <div className="modal-bottom-actions">
-              <button className="modal-close-bottom" onClick={onClose}>
-                ↑ 閉じる
-              </button>
+
+              {(prevArticle || nextArticle) && (
+                <div className="modal-nav">
+                  {prevArticle ? (
+                    <button className="prev" onClick={()=> onOpen({ article: prevArticle.id })}>
+                      <span className="nav-label">← 前の記事</span>
+                      <span className="nav-title">{prevArticle.title}</span>
+                    </button>
+                  ) : <span className="nav-empty"/>}
+                  {nextArticle ? (
+                    <button className="next" onClick={()=> onOpen({ article: nextArticle.id })}>
+                      <span className="nav-label">次の記事 →</span>
+                      <span className="nav-title">{nextArticle.title}</span>
+                    </button>
+                  ) : <span className="nav-empty"/>}
+                </div>
+              )}
+            </div>
+          </>}
+        </div>
+      </div>
+      {showToast && <div className="share-toast">🔗 URLをコピーしました</div>}
+    </>
+  );
+}
+
+// MarkdownView wrapper that injects ids into headings
+function MarkdownArticleView({ source, headings }){
+  const html = useMemo(() => {
+    let rendered = window.renderMarkdown(source);
+    // Wire heading ids
+    let idx = 0;
+    rendered = rendered.replace(/<(h[1-3])>([^<]*)<\/\1>/g, (m, tag, text) => {
+      const h = headings[idx++];
+      if (!h) return m;
+      return `<${tag} id="h-${h.id}">${text}</${tag}>`;
+    });
+    return rendered;
+  }, [source, headings]);
+  return <div className="md-body" dangerouslySetInnerHTML={{__html: html}} />;
+}
+
+// ── Cats page ────────────────────────────────────────────
+function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag, selectedCatId }){
+  const cat = selectedCatId ? catsById[selectedCatId] : null;
+
+  if (cat){
+    // Cat detail page
+    const catArticles = sortByDateDesc(articles.filter(a => !a.draft && a.cat === cat.id));
+    return (
+      <div className="shell">
+        <div className="cat-hero">
+          {cat.photo
+            ? <img className="cat-hero-photo" src={cat.photo} alt={cat.name} />
+            : <div className="cat-hero-photo-placeholder">{(cat.name||'?').slice(0,2)}</div>}
+          <h1 className="cat-hero-name">{cat.name}</h1>
+          {cat.tagline && <p className="cat-hero-tagline">{cat.tagline}</p>}
+          <div className="cat-hero-meta">
+            {cat.species && <span><strong>種類:</strong> {cat.species}</span>}
+            {cat.gender && <span><strong>性別:</strong> {cat.gender}</span>}
+            {cat.age && <span><strong>年齢:</strong> {cat.age}</span>}
+            {cat.origin && <span><strong>来歴:</strong> {cat.origin}</span>}
+          </div>
+          {cat.bio && (
+            <div className="cat-hero-bio md-body">
+              <MarkdownArticleView source={cat.bio} headings={[]} />
+            </div>
+          )}
+        </div>
+
+        {catArticles.length > 0 && (
+          <div className="section">
+            <div className="section-head">
+              <h2 className="section-title">{cat.name}の記事</h2>
+              <span className="section-count">{catArticles.length.toString().padStart(2,'0')}</span>
+            </div>
+            <div className="articles">
+              {catArticles.map(a => <ArticleCard key={a.id} item={a} onOpen={onOpenArticle} onTag={onTag} catsById={catsById}/>)}
             </div>
           </div>
-        </>}
+        )}
       </div>
+    );
+  }
+
+  // Cats index
+  const withCounts = cats.map(c => ({
+    ...c,
+    count: articles.filter(a => !a.draft && a.cat === c.id).length,
+  }));
+  return (
+    <div className="shell">
+      <div style={{textAlign:'center', padding:'24px 0 12px'}}>
+        <h1 style={{font:'900 clamp(24px, 5vw, 34px)/1.3 var(--font-heading)', margin:'0 0 6px', color:'var(--ink)'}}>
+          🐾 うちの子たち
+        </h1>
+        <p style={{color:'var(--ink-soft)', fontSize:14, margin:0}}>
+          プロフィールと記事アーカイブ
+        </p>
+      </div>
+      {cats.length === 0 ? (
+        <div className="empty-state">まだ紹介ページはありません。</div>
+      ) : (
+        <div className="cats-grid">
+          {withCounts.map(c => (
+            <button key={c.id} className="cat-card" onClick={()=>onSelectCat(c.id)}>
+              {c.photo
+                ? <img className="cat-card-photo" src={c.photo} alt={c.name}/>
+                : <div className="cat-card-placeholder">{(c.name||'?').slice(0,2)}</div>}
+              <div className="cat-card-name">{c.name}</div>
+              {c.tagline && <div className="cat-card-tagline">{c.tagline}</div>}
+              <div className="cat-card-count">{c.count.toString().padStart(2,'0')} 記事</div>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -229,24 +467,32 @@ function ArticleModal({ articleId, onClose, onTag }){
 function Viewer(){
   const [config, setConfig] = useState(null);
   const [articles, setArticles] = useState([]);
+  const [cats, setCats] = useState([]);
   const [error, setError] = useState(null);
   const [hashState, setHashStateReact] = useState(parseHashState());
+  const [themeMode, cycleTheme] = useTheme();
 
-  // watch hash changes (back/forward)
+  // Watch hash changes
   useEffect(()=>{
     const onHash = () => setHashStateReact(parseHashState());
     window.addEventListener('hashchange', onHash);
-    return () => window.removeEventListener('hashchange', onHash);
+    window.addEventListener('popstate', onHash);
+    return () => {
+      window.removeEventListener('hashchange', onHash);
+      window.removeEventListener('popstate', onHash);
+    };
   }, []);
 
-  // load initial data
+  // Load initial data
   useEffect(()=>{
     Promise.all([
       fetch('site-config.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('site-config.json'))),
       fetch('articles/index.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : Promise.reject(new Error('articles/index.json'))),
-    ]).then(([cfg, idx])=>{
+      fetch('cats.json', { cache: 'no-cache' }).then(r => r.ok ? r.json() : {cats:[]}).catch(()=>({cats:[]})),
+    ]).then(([cfg, idx, catsData])=>{
       setConfig(cfg);
       setArticles(idx.articles || []);
+      setCats(catsData.cats || []);
       applyTheme(cfg.theme);
       applyAvatarVars(cfg);
       if (cfg.name) document.title = cfg.name;
@@ -256,37 +502,56 @@ function Viewer(){
     });
   }, []);
 
-  // controls
+  const catsById = useMemo(() => Object.fromEntries(cats.map(c => [c.id, c])), [cats]);
+
+  // Navigation helpers
   const setTag = useCallback((tag) => {
     const s = parseHashState();
-    s.tag = tag === s.tag ? '' : tag; // toggle
-    s.page = 1;
+    s.tag = tag === s.tag ? '' : tag;
+    s.pageNum = 1;
+    s.page = 'home';
     setHashState(s);
     setHashStateReact({ ...s });
   }, []);
   const setQuery = useCallback((q) => {
     const s = parseHashState();
     s.q = q;
-    s.page = 1;
-    setHashState(s);
+    s.pageNum = 1;
+    s.page = 'home';
+    replaceHashState(s);
     setHashStateReact({ ...s });
   }, []);
-  const setPage = useCallback((p) => {
+  const setPageNum = useCallback((p) => {
     const s = parseHashState();
-    s.page = p;
+    s.pageNum = p;
     setHashState(s);
     setHashStateReact({ ...s });
-    // scroll to top of list
     document.getElementById('article-list-top')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, []);
-  const openArticle = useCallback((id) => {
+  const openArticle = useCallback((idOrPatch) => {
     const s = parseHashState();
-    s.article = id;
+    if (typeof idOrPatch === 'string') s.article = idOrPatch;
+    else Object.assign(s, idOrPatch);
     setHashState(s);
     setHashStateReact({ ...s });
   }, []);
   const closeArticle = useCallback(() => {
     const s = parseHashState();
+    s.article = '';
+    setHashState(s);
+    setHashStateReact({ ...s });
+  }, []);
+  const goToPage = useCallback((page) => {
+    const s = parseHashState();
+    s.page = page;
+    s.tag = ''; s.q = ''; s.pageNum = 1; s.article = ''; s.cat = '';
+    setHashState(s);
+    setHashStateReact({ ...s });
+  }, []);
+  const selectCat = useCallback((catId) => {
+    const s = parseHashState();
+    s.page = 'cats';
+    s.cat = catId;
     s.article = '';
     setHashState(s);
     setHashStateReact({ ...s });
@@ -309,7 +574,6 @@ function Viewer(){
     return sortByDateDesc(list);
   }, [articles, hashState.tag, hashState.q]);
 
-  // Tag counts (all published articles, ignoring current tag filter)
   const tagCounts = useMemo(() => {
     const map = new Map();
     for (const a of (articles || [])){
@@ -321,15 +585,12 @@ function Viewer(){
     return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
   }, [articles]);
 
-  // Pagination
   const totalPages = Math.max(1, Math.ceil(visible.length / PER_PAGE));
-  const page = Math.min(hashState.page, totalPages);
-  const paged = visible.slice((page-1) * PER_PAGE, page * PER_PAGE);
+  const pageNum = Math.min(hashState.pageNum, totalPages);
+  const paged = visible.slice((pageNum-1) * PER_PAGE, pageNum * PER_PAGE);
 
   const latest = visible[0];
-  const rest = paged.filter(a => !latest || a.id !== latest.id || page > 1);
-  // If we're on page 1 with no filter, hero is latest; rest is the rest of page 1 (excluding hero)
-  const showHero = page === 1 && !hashState.tag && !hashState.q && latest;
+  const showHero = pageNum === 1 && !hashState.tag && !hashState.q && latest;
   const listItems = showHero ? paged.slice(1) : paged;
 
   if (error){
@@ -340,12 +601,67 @@ function Viewer(){
       </div>
     );
   }
-  if (!config) return null;
+  if (!config) return <div className="viewer-loading">読み込み中…</div>;
 
   const t = config;
+  const themeIcon = themeMode === 'auto' ? '⚙' : themeMode === 'light' ? '☀️' : '🌙';
+  const themeLabel = themeMode === 'auto' ? '自動' : themeMode === 'light' ? 'ライト' : 'ダーク';
 
+  // Cat detail page
+  if (hashState.page === 'cats'){
+    return (
+      <div className="layout-desktop">
+        <nav className="topnav">
+          <button className="nav-brand" onClick={()=>goToPage('home')} style={{background:'none', border:'none', cursor:'pointer', padding:0}}>
+            {t.name}
+          </button>
+          <div className="nav-links">
+            <button className="nav-link" onClick={()=>goToPage('home')}>ブログ</button>
+            <button className={"nav-link" + (hashState.page === 'cats' ? ' is-active' : '')} onClick={()=>goToPage('cats')}>うちの子たち</button>
+          </div>
+        </nav>
+        <CatsPage
+          cats={cats}
+          articles={articles}
+          catsById={catsById}
+          onSelectCat={selectCat}
+          onOpenArticle={(id)=>openArticle(id)}
+          onTag={setTag}
+          selectedCatId={hashState.cat}
+        />
+        <div className="shell" style={{paddingTop:0}}>
+          <div className="footer">© {new Date().getFullYear()} {t.name} · made with ♡</div>
+        </div>
+        <button className="theme-toggle" onClick={cycleTheme} title={`テーマ: ${themeLabel}(クリックで切替)`}>{themeIcon}</button>
+        {hashState.article && (
+          <ArticleModal
+            articleId={hashState.article}
+            allArticles={articles}
+            catsById={catsById}
+            onClose={closeArticle}
+            onTag={setTag}
+            onOpen={openArticle}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // Home page
   return (
     <div className="layout-desktop">
+      <nav className="topnav">
+        <button className="nav-brand" onClick={()=>goToPage('home')} style={{background:'none', border:'none', cursor:'pointer', padding:0}}>
+          {t.name}
+        </button>
+        <div className="nav-links">
+          <button className={"nav-link" + (hashState.page === 'home' ? ' is-active' : '')} onClick={()=>goToPage('home')}>ブログ</button>
+          {cats.length > 0 && (
+            <button className="nav-link" onClick={()=>goToPage('cats')}>うちの子たち</button>
+          )}
+        </div>
+      </nav>
+
       <div className="shell">
         <div className="grid">
           <aside className="col-left">
@@ -391,6 +707,14 @@ function Viewer(){
                 </div>
               </div>
             )}
+
+            <div className="section" style={{textAlign:'center', paddingTop:20, borderTop:'1px dashed var(--line)'}}>
+              <a href="rss.xml" style={{
+                color:'var(--ink-mute)', textDecoration:'none',
+                font:'12px var(--font-mono)', letterSpacing:'.08em',
+                display:'inline-flex', alignItems:'center', gap:6,
+              }}>📡 RSS を購読</a>
+            </div>
           </aside>
 
           <main className="col-right">
@@ -400,6 +724,14 @@ function Viewer(){
                 <span className="hero-kicker">最新の投稿</span>
                 <h1 className="hero-title">{latest.title}</h1>
                 <div className="hero-date">{formatDate(latest.date)}</div>
+                {latest.cat && catsById[latest.cat] && (
+                  <div style={{marginTop:8}}>
+                    <span className="article-cat-badge">
+                      {catsById[latest.cat].photo ? <img src={catsById[latest.cat].photo} alt=""/> : null}
+                      <span className="badge-name">🐾 {catsById[latest.cat].name}</span>
+                    </span>
+                  </div>
+                )}
                 {Array.isArray(latest.tags) && latest.tags.length > 0 && (
                   <div className="hero-tags">
                     {latest.tags.map(tg => <span key={tg} className="tag-chip tag-clickable" onClick={()=>setTag(tg)}>#{tg}</span>)}
@@ -414,7 +746,6 @@ function Viewer(){
 
             <div id="article-list-top"></div>
 
-            {/* Search + active filter */}
             <div className="list-toolbar">
               <input
                 className="search-input"
@@ -452,14 +783,14 @@ function Viewer(){
                   <span className="section-count">{visible.length.toString().padStart(2,'0')}</span>
                 </div>
                 <div className="articles">
-                  {listItems.map(a => <ArticleCard key={a.id} item={a} onOpen={openArticle} onTag={setTag} />)}
+                  {listItems.map(a => <ArticleCard key={a.id} item={a} onOpen={openArticle} onTag={setTag} catsById={catsById}/>)}
                 </div>
 
                 {totalPages > 1 && (
                   <div className="pagination">
-                    <button onClick={()=>setPage(page-1)} disabled={page<=1}>← 前へ</button>
-                    <span className="page-indicator">{page} / {totalPages}</span>
-                    <button onClick={()=>setPage(page+1)} disabled={page>=totalPages}>次へ →</button>
+                    <button onClick={()=>setPageNum(pageNum-1)} disabled={pageNum<=1}>← 前へ</button>
+                    <span className="page-indicator">{pageNum} / {totalPages}</span>
+                    <button onClick={()=>setPageNum(pageNum+1)} disabled={pageNum>=totalPages}>次へ →</button>
                   </div>
                 )}
               </div>
@@ -470,11 +801,16 @@ function Viewer(){
         <div className="footer">© {new Date().getFullYear()} {t.name} · made with ♡</div>
       </div>
 
+      <button className="theme-toggle" onClick={cycleTheme} title={`テーマ: ${themeLabel}(クリックで切替)`}>{themeIcon}</button>
+
       {hashState.article && (
         <ArticleModal
           articleId={hashState.article}
+          allArticles={articles}
+          catsById={catsById}
           onClose={closeArticle}
           onTag={setTag}
+          onOpen={openArticle}
         />
       )}
     </div>

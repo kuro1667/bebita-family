@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-<!-- ─── キャッシュ制御(スマホなどでも常に最新を読ませる) ─── -->
+<!-- キャッシュ制御(常に最新版を読ませる) -->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
@@ -12,11 +12,14 @@
 <title>bebita_family</title>
 <meta name="description" content="bebita_family — 猫たちの日々の記録">
 
+<!-- Auto-discovery for RSS readers -->
+<link rel="alternate" type="application/rss+xml" title="bebita_family" href="rss.xml">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Noto+Serif+JP:wght@400;700;900&family=Klee+One:wght@400;600&family=M+PLUS+Rounded+1c:wght@400;500;700;800&family=Shippori+Mincho:wght@500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="site.css?v=20260821">
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
@@ -27,10 +30,10 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 
-<!-- Site scripts (no editor UI). ?v=... を付けると強制的に最新を取得できる -->
-<script type="text/babel" src="icons.jsx?v=20260821"></script>
-<script type="text/babel" src="markdown.jsx?v=20260821"></script>
-<script type="text/babel" src="viewer.jsx?v=20260821"></script>
+<!-- Site scripts -->
+<script type="text/babel" src="icons.jsx"></script>
+<script type="text/babel" src="markdown.jsx"></script>
+<script type="text/babel" src="viewer.jsx"></script>
 
 </body>
 </html>

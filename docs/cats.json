@@ -1,0 +1,15 @@
+{
+  "cats": [
+    {
+      "id": "dsbkdjn",
+      "name": "めい",
+      "tagline": "おっとりした三毛猫",
+      "species": "三毛猫",
+      "gender": "おんなの子",
+      "age": "13",
+      "origin": "拾い猫",
+      "bio": "",
+      "photo": ""
+    }
+  ]
+}
