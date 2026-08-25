@@ -406,9 +406,10 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
       return a.cat === cat.id;
     };
     const catArticles = sortByDateDesc(articles.filter(a => !a.draft && matchesCat(a)));
-    const ca = cat.anim || {};
-    const acls = (key) => 'ca-' + (ca[key] || 'none');
-    const adly = (key, base) => ({ animationDelay: `${ca[key] != null ? ca[key] : (base || 0)}ms` });
+    const animCls = cat.anim && cat.anim !== 'none' ? `ca-${cat.anim}` : '';
+    const animDly = cat.animDelay ?? 0;
+    const acls = () => animCls;
+    const adly = (key, base) => animCls ? ({ animationDelay: `${animDly + (base || 0)}ms` }) : {};
     return (
       <div className="shell">
         <div className="cat-hero" style={{ textAlign: cat.profileAlign || 'center' }}>
