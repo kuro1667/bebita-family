@@ -52,6 +52,16 @@ function slugify(text){
     .replace(/-+/g,'-').replace(/^-|-$/g,'');
 }
 
+// ── animation helpers ────────────────────────────────────
+function getAnimProps(siteConfig, key, extraDelay = 0) {
+  const cfg = siteConfig?.animations?.[key];
+  if (!cfg || cfg.anim === 'none') return { cls: '', style: {} };
+  return {
+    cls: `ca-${cfg.anim}`,
+    style: { animationDelay: `${(cfg.delay ?? 0) + extraDelay}ms` },
+  };
+}
+
 // ── theme ────────────────────────────────────────────────
 const BG_PATTERNS_VIEW = {
   'なし': 'none',
@@ -192,11 +202,11 @@ function SNSCard({ item }){
 }
 
 // ── Article card ──────────────────────────────────────────
-function ArticleCard({ item, onOpen, onTag, catsById }){
+function ArticleCard({ item, onOpen, onTag, catsById, animCls, animStyle }){
   const catIds = Array.isArray(item.cats) && item.cats.length ? item.cats : (item.cat ? [item.cat] : []);
   const cats = catIds.map(id => catsById[id]).filter(Boolean);
   return (
-    <button className="article-card" onClick={()=>onOpen(item.id)}>
+    <button className={`article-card${animCls ? ' '+animCls : ''}`} style={animStyle||{}} onClick={()=>onOpen(item.id)}>
       {item.cover && item.cover.trim() && <img className="article-thumb" src={encodeURI(item.cover)} alt="" loading="lazy" />}
       <div className="article-body">
         <div className="article-date"><span>{formatDate(item.date)}</span></div>
@@ -226,7 +236,7 @@ function ArticleCard({ item, onOpen, onTag, catsById }){
 }
 
 // ── Article modal ─────────────────────────────────────────
-function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen }){
+function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen, siteConfig }){
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -295,7 +305,9 @@ function ArticleModal({ articleId, allArticles, catsById, onClose, onTag, onOpen
   return (
     <>
       <div className="modal-backdrop" onClick={onClose} ref={backdropRef}>
-        <div className="modal" onClick={e=>e.stopPropagation()}>
+          <div className={`modal${getAnimProps(siteConfig,'articleModal').cls ? ' '+getAnimProps(siteConfig,'articleModal').cls : ''}`}
+            style={getAnimProps(siteConfig,'articleModal').style}
+            onClick={e=>e.stopPropagation()}>
           <button className="share-button" onClick={share} title="この記事のURLを共有" aria-label="share">↗</button>
           <button className="modal-close" onClick={onClose} aria-label="閉じる">✕</button>
           {loading && <div className="modal-inner"><div className="viewer-loading">読み込み中…</div></div>}
@@ -396,7 +408,7 @@ function MarkdownArticleView({ source, headings }){
 }
 
 // ── Cats page ────────────────────────────────────────────
-function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag, selectedCatId }){
+function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag, selectedCatId, siteConfig }){
   const cat = selectedCatId ? catsById[selectedCatId] : null;
 
   if (cat){
@@ -471,16 +483,19 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
         <div className="empty-state">まだ紹介ページはありません。</div>
       ) : (
         <div className="cats-grid">
-          {withCounts.map(c => (
-            <button key={c.id} className="cat-card" onClick={()=>onSelectCat(c.id)}>
-              {c.photo
-                ? <img className="cat-card-photo" src={encodeURI(c.photo)} alt={c.name} loading="lazy" onError={(e)=>{e.target.style.display='none'; e.target.nextSibling && (e.target.nextSibling.style.display='');}}/>
-                : <div className="cat-card-placeholder">{(c.name||'?').slice(0,2)}</div>}
-              <div className="cat-card-name">{c.name}</div>
-              {c.tagline && <div className="cat-card-tagline">{c.tagline}</div>}
-              <div className="cat-card-count">{c.count} 記事</div>
-            </button>
-          ))}
+          {withCounts.map((c, i) => {
+            const ap = getAnimProps(siteConfig, 'catsGrid', i * 60);
+            return (
+              <button key={c.id} className={`cat-card${ap.cls ? ' '+ap.cls : ''}`} style={ap.style} onClick={()=>onSelectCat(c.id)}>
+                {c.photo
+                  ? <img className="cat-card-photo" src={encodeURI(c.photo)} alt={c.name} loading="lazy" onError={(e)=>{e.target.style.display='none'; e.target.nextSibling && (e.target.nextSibling.style.display='');}}/>
+                  : <div className="cat-card-placeholder">{(c.name||'?').slice(0,2)}</div>}
+                <div className="cat-card-name">{c.name}</div>
+                {c.tagline && <div className="cat-card-tagline">{c.tagline}</div>}
+                <div className="cat-card-count">{c.count} 記事</div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
@@ -652,6 +667,7 @@ function Viewer(){
           onOpenArticle={(id)=>openArticle(id)}
           onTag={setTag}
           selectedCatId={hashState.cat}
+          siteConfig={config}
         />
         <div className="shell" style={{paddingTop:0}}>
           <div className="footer">© {new Date().getFullYear()} {t.name} · made with ♡</div>
@@ -665,6 +681,7 @@ function Viewer(){
             onClose={closeArticle}
             onTag={setTag}
             onOpen={openArticle}
+            siteConfig={config}
           />
         )}
       </div>
@@ -689,7 +706,8 @@ function Viewer(){
       <div className="shell">
         <div className="grid">
           <aside className="col-left">
-            <div className="profile">
+            <div className={`profile${getAnimProps(config,'homeProfileCard').cls ? ' '+getAnimProps(config,'homeProfileCard').cls : ''}`}
+              style={getAnimProps(config,'homeProfileCard').style}>
               <div className="avatar">
                 {t.avatarUrl
                   ? <img src={encodeURI(t.avatarUrl)} alt="" />
@@ -743,7 +761,8 @@ function Viewer(){
 
           <main className="col-right">
             {showHero && (
-              <section className="hero">
+              <section className={`hero${getAnimProps(config,'homeHeroArticle').cls ? ' '+getAnimProps(config,'homeHeroArticle').cls : ''}`}
+                style={getAnimProps(config,'homeHeroArticle').style}>
                 {latest.cover && latest.cover.trim() && <img className="hero-cover" src={encodeURI(latest.cover)} alt="" />}
                 <span className="hero-kicker">最新の投稿</span>
                 <h1 className="hero-title">{latest.title}</h1>
@@ -814,7 +833,13 @@ function Viewer(){
                   <span className="section-count">{visible.length}</span>
                 </div>
                 <div className="articles">
-                  {listItems.map(a => <ArticleCard key={a.id} item={a} onOpen={openArticle} onTag={setTag} catsById={catsById}/>)}
+                  {listItems.map((a, i) => {
+                    const ap = getAnimProps(config, 'homeArticleCard', i * 60);
+                    return (
+                      <ArticleCard key={a.id} item={a} onOpen={openArticle} onTag={setTag} catsById={catsById}
+                        animCls={ap.cls} animStyle={ap.style} />
+                    );
+                  })}
                 </div>
 
                 {totalPages > 1 && (
@@ -842,6 +867,7 @@ function Viewer(){
           onClose={closeArticle}
           onTag={setTag}
           onOpen={openArticle}
+          siteConfig={config}
         />
       )}
     </div>

@@ -35,5 +35,27 @@
       "label": "",
       "iconMode": "auto"
     }
-  ]
+  ],
+  "animations": {
+    "homeProfileCard": {
+      "anim": "fadeIn",
+      "delay": 0
+    },
+    "homeHeroArticle": {
+      "anim": "fadeIn",
+      "delay": 100
+    },
+    "homeArticleCard": {
+      "anim": "fadeIn",
+      "delay": 50
+    },
+    "catsGrid": {
+      "anim": "slideUp",
+      "delay": 0
+    },
+    "articleModal": {
+      "anim": "fadeIn",
+      "delay": 0
+    }
+  }
 }
