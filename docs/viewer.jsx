@@ -408,7 +408,7 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
     const catArticles = sortByDateDesc(articles.filter(a => !a.draft && matchesCat(a)));
     return (
       <div className="shell">
-        <div className="cat-hero">
+        <div className="cat-hero" style={{ textAlign: cat.profileAlign || 'center' }}>
           {cat.photo
             ? <img className="cat-hero-photo" src={encodeURI(cat.photo)} alt={cat.name} />
             : <div className="cat-hero-photo-placeholder">{(cat.name||'?').slice(0,2)}</div>}
