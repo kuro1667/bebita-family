@@ -24,7 +24,8 @@
       "origin": "ペットショップ",
       "bio": "ちょっぴり怒りん坊だけど、とってもキュート\n小さな体でプリプリしている姿がたまらない子",
       "photo": "images/img-20260824-yc78zrz1.webp",
-      "profileAlign": "center"
+      "profileAlign": "center",
+      "anim": "float"
     },
     {
       "id": "sd5jek6",
@@ -36,7 +37,8 @@
       "origin": "ペットショップ",
       "bio": "いつでもどこでも、おうちの破壊を企む。\n今日も元気に破壊活動中の破壊神",
       "photo": "images/img-20260824-bdvh16o5.webp",
-      "profileAlign": "center"
+      "profileAlign": "center",
+      "anim": "spin"
     },
     {
       "id": "z2hqqhu",
@@ -48,7 +50,8 @@
       "origin": "ペットショップ",
       "bio": "とにかく遊ぶのが大好き！\n買ってきたおもちゃは、なんと一日で破壊しちゃうほどの遊び好き",
       "photo": "images/img-20260824-cg9nlxcf.webp",
-      "profileAlign": "center"
+      "profileAlign": "center",
+      "anim": "bounce"
     }
   ]
 }
