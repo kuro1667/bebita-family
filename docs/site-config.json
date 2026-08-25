@@ -38,23 +38,23 @@
   ],
   "animations": {
     "homeProfileCard": {
-      "anim": "fadeIn",
+      "anim": "fadein",
       "delay": 0
     },
     "homeHeroArticle": {
-      "anim": "fadeIn",
+      "anim": "fadein",
       "delay": 100
     },
     "homeArticleCard": {
-      "anim": "fadeIn",
+      "anim": "fadein",
       "delay": 50
     },
     "catsGrid": {
-      "anim": "slideUp",
+      "anim": "slideup",
       "delay": 0
     },
     "articleModal": {
-      "anim": "fadeIn",
+      "anim": "fadein",
       "delay": 0
     }
   }
