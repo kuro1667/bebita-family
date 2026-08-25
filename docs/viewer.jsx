@@ -406,22 +406,27 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
       return a.cat === cat.id;
     };
     const catArticles = sortByDateDesc(articles.filter(a => !a.draft && matchesCat(a)));
+    const ca = cat.anim || {};
+    const acls = (key) => 'ca-' + (ca[key] || 'none');
+    const adly = (key, base) => ({ animationDelay: `${ca[key] != null ? ca[key] : (base || 0)}ms` });
     return (
       <div className="shell">
         <div className="cat-hero" style={{ textAlign: cat.profileAlign || 'center' }}>
-          {cat.photo
-            ? <img className="cat-hero-photo" src={encodeURI(cat.photo)} alt={cat.name} />
-            : <div className="cat-hero-photo-placeholder">{(cat.name||'?').slice(0,2)}</div>}
-          <h1 className="cat-hero-name">{cat.name}</h1>
-          {cat.tagline && <p className="cat-hero-tagline">{cat.tagline}</p>}
-          <div className="cat-hero-meta">
+          <div className={acls('photo')} style={adly('photoDelay', 0)}>
+            {cat.photo
+              ? <img className="cat-hero-photo" src={encodeURI(cat.photo)} alt={cat.name} />
+              : <div className="cat-hero-photo-placeholder">{(cat.name||'?').slice(0,2)}</div>}
+          </div>
+          <h1 className={`cat-hero-name ${acls('name')}`} style={adly('nameDelay', 100)}>{cat.name}</h1>
+          {cat.tagline && <p className={`cat-hero-tagline ${acls('tagline')}`} style={adly('taglineDelay', 180)}>{cat.tagline}</p>}
+          <div className={`cat-hero-meta ${acls('meta')}`} style={adly('metaDelay', 260)}>
             {cat.species && <span><strong>種類:</strong> {cat.species}</span>}
             {cat.gender && <span><strong>性別:</strong> {cat.gender}</span>}
             {cat.age && <span><strong>年齢:</strong> {cat.age}</span>}
             {cat.origin && <span><strong>来歴:</strong> {cat.origin}</span>}
           </div>
           {cat.bio && (
-            <div className="cat-hero-bio md-body" style={{ textAlign: cat.profileAlign || 'center' }}>
+            <div className={`cat-hero-bio md-body ${acls('bio')}`} style={{ textAlign: cat.profileAlign || 'center', ...adly('bioDelay', 340) }}>
               <MarkdownArticleView source={cat.bio} headings={[]} />
             </div>
           )}

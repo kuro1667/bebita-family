@@ -10,7 +10,9 @@
       "origin": "拾い猫",
       "bio": "腎臓病と向き合いながら、現在も治療中。\n治療を続けながら、とっても元気に過ごしています。\nご飯も毎日よく食べる、食いしん坊さん",
       "photo": "images/img-20260824-brf9zqpj.webp",
-      "profileAlign": "center"
+      "profileAlign": "center",
+      "animDelay": 0,
+      "anim": "float"
     },
     {
       "id": "g9f5aqe",
