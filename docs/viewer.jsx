@@ -472,7 +472,7 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
                 : <div className="cat-card-placeholder">{(c.name||'?').slice(0,2)}</div>}
               <div className="cat-card-name">{c.name}</div>
               {c.tagline && <div className="cat-card-tagline">{c.tagline}</div>}
-              <div className="cat-card-count">{c.count.toString().padStart(2,'0')} 記事</div>
+              <div className="cat-card-count">{c.count} 記事</div>
             </button>
           ))}
         </div>
