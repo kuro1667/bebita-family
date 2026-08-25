@@ -421,7 +421,7 @@ function CatsPage({ cats, articles, catsById, onSelectCat, onOpenArticle, onTag,
             {cat.origin && <span><strong>来歴:</strong> {cat.origin}</span>}
           </div>
           {cat.bio && (
-            <div className="cat-hero-bio md-body">
+            <div className="cat-hero-bio md-body" style={{ textAlign: cat.profileAlign || 'center' }}>
               <MarkdownArticleView source={cat.bio} headings={[]} />
             </div>
           )}
