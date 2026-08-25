@@ -37,25 +37,13 @@
     }
   ],
   "animations": {
-    "homeProfileCard": {
-      "anim": "fadein",
-      "delay": 0
-    },
-    "homeHeroArticle": {
-      "anim": "fadein",
-      "delay": 100
-    },
-    "homeArticleCard": {
-      "anim": "fadein",
-      "delay": 50
-    },
-    "catsGrid": {
-      "anim": "slideup",
-      "delay": 0
-    },
-    "articleModal": {
-      "anim": "fadein",
-      "delay": 0
-    }
+    "homeProfileCard":    { "anim": "fadein",  "delay": 0   },
+    "homeHeroArticle":    { "anim": "fadein",  "delay": 100 },
+    "homeArticleCard":    { "anim": "fadein",  "delay": 50  },
+    "catsGrid":           { "anim": "slideup", "delay": 0   },
+    "articleModal":       { "anim": "fadein",  "delay": 0   },
+    "snsCard":            { "anim": "slideup", "delay": 0   },
+    "searchBar":          { "anim": "fadein",  "delay": 80  },
+    "articleListSection": { "anim": "fadein",  "delay": 120 }
   }
 }

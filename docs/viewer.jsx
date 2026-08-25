@@ -186,11 +186,11 @@ function extractHeadings(md){
 }
 
 // ── SNS card ──────────────────────────────────────────────
-function SNSCard({ item }){
+function SNSCard({ item, animCls, animStyle }){
   const label = resolveSNSLabel(item);
   const handle = extractHandle(item.url);
   return (
-    <a className="sns-card" href={item.url || '#'} target="_blank" rel="noopener noreferrer">
+    <a className={`sns-card${animCls ? ' '+animCls : ''}`} style={animStyle||{}} href={item.url || '#'} target="_blank" rel="noopener noreferrer">
       <span className="sns-icon"><SNSIconResolved item={item} /></span>
       <span className="sns-meta">
         <div className="sns-label">{label}</div>
@@ -726,7 +726,10 @@ function Viewer(){
                   <span className="section-count">{(t.sns||[]).length}</span>
                 </div>
                 <div className="sns-list">
-                  {(t.sns||[]).map(s => <SNSCard key={s.id} item={s} />)}
+                  {(t.sns||[]).map((s, i) => {
+                    const ap = getAnimProps(config, 'snsCard', i * 80);
+                    return <SNSCard key={s.id} item={s} animCls={ap.cls} animStyle={ap.style} />;
+                  })}
                 </div>
               </div>
             )}
@@ -796,7 +799,8 @@ function Viewer(){
 
             <div id="article-list-top"></div>
 
-            <div className="list-toolbar">
+            <div className={`list-toolbar${getAnimProps(config,'searchBar').cls ? ' '+getAnimProps(config,'searchBar').cls : ''}`}
+              style={getAnimProps(config,'searchBar').style}>
               <input
                 className="search-input"
                 type="search"
@@ -825,7 +829,8 @@ function Viewer(){
                   : '該当する記事がありません。'}
               </div>
             ) : (
-              <div className="section">
+              <div className={`section${getAnimProps(config,'articleListSection').cls ? ' '+getAnimProps(config,'articleListSection').cls : ''}`}
+                style={getAnimProps(config,'articleListSection').style}>
                 <div className="section-head">
                   <h2 className="section-title">
                     {hashState.tag ? `#${hashState.tag} の記事` : (hashState.q ? '検索結果' : 'これまでの日記')}
