@@ -81,7 +81,7 @@ a{ color: inherit; }
 .shell{
   max-width: 1120px;
   margin: 0 auto;
-  padding: clamp(20px, 4vw, 56px) clamp(18px, 4vw, 40px) 120px;
+  padding: clamp(20px, 4vw, 56px) clamp(16px, 5vw, 40px) 120px;
 }
 
 .mobile-frame-scroll .shell{
@@ -148,10 +148,12 @@ a{ color: inherit; }
 }
 .bio{
   color: var(--ink-soft);
-  font-size: clamp(12.5px, 3.5vw, 14px);
+  font-size: clamp(12px, 3.2vw, 14px);
   line-height:1.75;
   margin: 8px 4px 4px;
   text-align:left;
+  word-break: auto-phrase;
+  overflow-wrap: break-word;
 }
 .bio.md-body p{ margin: 0 0 .6em; }
 .bio.md-body p:last-child{ margin-bottom: 0; }
@@ -538,23 +540,27 @@ a{ color: inherit; }
 .modal-title{
   font-family: var(--font-heading);
   font-weight:900;
-  font-size: clamp(22px, 4vw, 30px);
+  font-size: clamp(18px, 5vw, 30px);
   line-height:1.4;
   margin: 8px 0 20px;
   color: var(--ink);
+  word-break: auto-phrase;
 }
 
 /* ── rich markdown output ───────────────────────────── */
 .md-body{
   color: var(--ink);
-  font-size: 15.5px;
-  line-height: 1.95;
+  font-size: clamp(13.5px, 3.8vw, 15.5px);
+  line-height: 1.85;
+  word-break: auto-phrase;
+  overflow-wrap: break-word;
 }
 .md-body h1, .md-body h2, .md-body h3{
   font-family: var(--font-heading);
   color: var(--ink);
   line-height: 1.4;
   margin: 1.5em 0 .5em;
+  word-break: auto-phrase;
 }
 .md-body h1{ font-size: 1.6em; font-weight: 900;}
 .md-body h2{ font-size: 1.32em; font-weight: 800; padding-bottom: .2em; border-bottom: 1px solid var(--line); }
@@ -1367,10 +1373,11 @@ a{ color: inherit; }
 .cat-hero-name{
   font-family: var(--font-heading);
   font-weight: 900;
-  font-size: clamp(28px, 5vw, 40px);
+  font-size: clamp(22px, 6vw, 40px);
   margin: 0 0 6px;
   color: var(--ink);
   letter-spacing: .02em;
+  word-break: auto-phrase;
 }
 .cat-hero-tagline{
   color: var(--ink-soft);
@@ -1399,9 +1406,11 @@ a{ color: inherit; }
   max-width: 560px;
   margin: 0 auto;
   color: var(--ink-soft);
-  font-size: 14.5px;
+  font-size: clamp(13px, 3.5vw, 14.5px);
   line-height: 1.85;
   text-align: left;
+  word-break: auto-phrase;
+  overflow-wrap: break-word;
 }
 .cat-hero-bio p{ margin: 0 0 1em; }
 
