@@ -1848,3 +1848,487 @@ a{ color: inherit; }
 .ca-popleft   { animation: anim-popleft   0.55s cubic-bezier(.22,1.2,.36,1) both; }
 .ca-popright  { animation: anim-popright  0.55s cubic-bezier(.22,1.2,.36,1) both; }
 
+@keyframes anim-flash {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75%      { opacity: 0; }
+}
+@keyframes anim-pulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+@keyframes anim-wobble {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-10px) rotate(-5deg); }
+  30%  { transform: translateX(8px)  rotate(4deg); }
+  45%  { transform: translateX(-6px) rotate(-3deg); }
+  60%  { transform: translateX(5px)  rotate(2deg); }
+  75%  { transform: translateX(-3px) rotate(-1deg); }
+  100% { transform: translateX(0); }
+}
+@keyframes anim-jello {
+  0%, 11%, 100% { transform: skewX(0deg) skewY(0deg); }
+  22%  { transform: skewX(-12.5deg)    skewY(-12.5deg); }
+  33%  { transform: skewX(6.25deg)     skewY(6.25deg); }
+  44%  { transform: skewX(-3.125deg)   skewY(-3.125deg); }
+  55%  { transform: skewX(1.5625deg)   skewY(1.5625deg); }
+  66%  { transform: skewX(-0.78125deg) skewY(-0.78125deg); }
+  77%  { transform: skewX(0.390625deg) skewY(0.390625deg); }
+  88%  { transform: skewX(-0.1953125deg) skewY(-0.1953125deg); }
+}
+@keyframes anim-headshake {
+  0%    { transform: translateX(0); }
+  6.5%  { transform: translateX(-6px) rotateY(-9deg); }
+  18.5% { transform: translateX(5px)  rotateY(7deg); }
+  31.5% { transform: translateX(-3px) rotateY(-5deg); }
+  43.5% { transform: translateX(2px)  rotateY(3deg); }
+  50%   { transform: translateX(0); }
+}
+@keyframes anim-fadeinup {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes anim-fadeindown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes anim-fadeinleft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes anim-fadeinright {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes anim-rotatein {
+  from { opacity: 0; transform: rotate(-200deg); }
+  to   { opacity: 1; transform: rotate(0deg); }
+}
+@keyframes anim-rotateindownleft {
+  from { opacity: 0; transform: rotate(-45deg); transform-origin: left bottom; }
+  to   { opacity: 1; transform: rotate(0deg);   transform-origin: left bottom; }
+}
+@keyframes anim-rotateindownright {
+  from { opacity: 0; transform: rotate(45deg);  transform-origin: right bottom; }
+  to   { opacity: 1; transform: rotate(0deg);   transform-origin: right bottom; }
+}
+@keyframes anim-zoomin {
+  from { opacity: 0; transform: scale(0.3); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes anim-zoominup {
+  from { opacity: 0; transform: scale(0.1) translateY(60px); }
+  to   { opacity: 1; transform: scale(1)   translateY(0); }
+}
+@keyframes anim-bouncein {
+  0%   { opacity: 0; transform: scale(0.3); }
+  20%  { transform: scale(1.1); }
+  40%  { transform: scale(0.9); }
+  60%  { opacity: 1; transform: scale(1.03); }
+  80%  { transform: scale(0.97); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes anim-bounceindown {
+  0%   { opacity: 0; transform: translateY(-60px); }
+  30%  { opacity: 1; transform: translateY(10px); }
+  50%  { transform: translateY(-6px); }
+  70%  { transform: translateY(4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes anim-bounceinup {
+  0%   { opacity: 0; transform: translateY(60px); }
+  30%  { opacity: 1; transform: translateY(-10px); }
+  50%  { transform: translateY(6px); }
+  70%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes anim-hinge {
+  0%       { transform: rotate(0);     transform-origin: top left; }
+  20%, 60% { transform: rotate(80deg); transform-origin: top left; }
+  40%, 80% { transform: rotate(60deg); transform-origin: top left; opacity: 1; }
+  100%     { transform: translateY(400px); opacity: 0; }
+}
+@keyframes anim-jackinthebox {
+  0%   { opacity: 0; transform: scale(0.1) rotate(30deg);  transform-origin: center bottom; }
+  50%  { transform: rotate(-10deg);                        transform-origin: center bottom; }
+  70%  { transform: rotate(3deg);                          transform-origin: center bottom; }
+  100% { opacity: 1; transform: scale(1) rotate(0deg);     transform-origin: center bottom; }
+}
+@keyframes anim-rollout {
+  from { opacity: 0; transform: translateX(-100%) rotate(-120deg); }
+  to   { opacity: 1; transform: translateX(0)     rotate(0deg); }
+}
+
+.ca-flash             { animation: anim-flash             0.7s  ease                        both; }
+.ca-pulse             { animation: anim-pulse             1.4s  ease-in-out           infinite; }
+.ca-wobble            { animation: anim-wobble            0.8s  ease                        both; }
+.ca-jello             { animation: anim-jello             0.8s  ease                        both; }
+.ca-headshake         { animation: anim-headshake         0.7s  ease                        both; }
+.ca-fadeinup          { animation: anim-fadeinup          0.6s  ease                        both; }
+.ca-fadeindown        { animation: anim-fadeindown        0.6s  ease                        both; }
+.ca-fadeinleft        { animation: anim-fadeinleft        0.6s  ease                        both; }
+.ca-fadeinright       { animation: anim-fadeinright       0.6s  ease                        both; }
+.ca-rotatein          { animation: anim-rotatein          0.6s  cubic-bezier(.22,1.2,.36,1) both; }
+.ca-rotateindownleft  { animation: anim-rotateindownleft  0.6s  cubic-bezier(.22,1.2,.36,1) both; transform-origin: left bottom; }
+.ca-rotateindownright { animation: anim-rotateindownright 0.6s  cubic-bezier(.22,1.2,.36,1) both; transform-origin: right bottom; }
+.ca-zoomin            { animation: anim-zoomin            0.55s cubic-bezier(.22,1.2,.36,1) both; }
+.ca-zoominup          { animation: anim-zoominup          0.6s  cubic-bezier(.22,1.2,.36,1) both; }
+.ca-bouncein          { animation: anim-bouncein          0.75s ease                        both; }
+.ca-bounceindown      { animation: anim-bounceindown      0.75s ease                        both; }
+.ca-bounceinup        { animation: anim-bounceinup        0.75s ease                        both; }
+.ca-hinge             { animation: anim-hinge             1.2s  ease                        both; }
+.ca-jackinthebox      { animation: anim-jackinthebox      0.8s  cubic-bezier(.22,1.2,.36,1) both; }
+.ca-rollout           { animation: anim-rollout           0.7s  cubic-bezier(.22,1.2,.36,1) both; }
+
+/* ── 追加アニメーション (v3) — 持続ループ系 + 新登場系 ──────────── */
+
+/* 🌊 浮遊・揺れ系 */
+@keyframes anim-sway {
+  0%, 100% { transform: rotate(-4deg); }
+  50%       { transform: rotate(4deg); }
+}
+@keyframes anim-hover {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%       { transform: translateY(-10px) scale(1.02); }
+}
+@keyframes anim-drift {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  25%  { transform: translate(6px, -8px) rotate(1.5deg); }
+  50%  { transform: translate(-4px, -14px) rotate(-1deg); }
+  75%  { transform: translate(-7px, -6px) rotate(2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+@keyframes anim-seaweed {
+  0%, 100% { transform: skewX(0deg) scaleY(1); transform-origin: bottom center; }
+  25%       { transform: skewX(5deg) scaleY(1.02); transform-origin: bottom center; }
+  75%       { transform: skewX(-5deg) scaleY(0.98); transform-origin: bottom center; }
+}
+@keyframes anim-buoy {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  33%       { transform: translateY(-7px) rotate(1deg); }
+  66%       { transform: translateY(3px) rotate(-1deg); }
+}
+@keyframes anim-cradle {
+  0%, 100% { transform: rotate(-8deg); transform-origin: top center; }
+  50%       { transform: rotate(8deg);  transform-origin: top center; }
+}
+@keyframes anim-pendulum {
+  0%, 100% { transform: rotate(-20deg); transform-origin: top center; }
+  50%       { transform: rotate(20deg);  transform-origin: top center; }
+}
+@keyframes anim-leaffall {
+  0%   { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  25%  { transform: translate(12px, 20px) rotate(15deg); }
+  50%  { transform: translate(-8px, 40px) rotate(-10deg); }
+  75%  { transform: translate(10px, 60px) rotate(20deg); }
+  100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+}
+
+/* 💓 拡縮・呼吸系 */
+@keyframes anim-breathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%       { transform: scale(1.06); opacity: 0.9; }
+}
+@keyframes anim-inflate {
+  0%, 100% { transform: scale(1); }
+  40%       { transform: scale(1.12) rotate(1deg); }
+  70%       { transform: scale(0.96) rotate(-0.5deg); }
+}
+@keyframes anim-throb {
+  0%, 100%  { transform: scale(1); }
+  10%, 30%  { transform: scale(1.14); }
+  20%       { transform: scale(1.05); }
+  40%, 60%, 80% { transform: scale(1); }
+  50%, 70%  { transform: scale(1.08); }
+}
+@keyframes anim-swell {
+  0%, 100% { transform: scaleX(1)   scaleY(1); }
+  50%       { transform: scaleX(1.08) scaleY(0.94); }
+}
+
+/* ✨ 光・透明系 */
+@keyframes anim-shimmer {
+  0%   { filter: brightness(1)   saturate(1); }
+  50%  { filter: brightness(1.3) saturate(1.4); }
+  100% { filter: brightness(1)   saturate(1); }
+}
+@keyframes anim-glimmer {
+  0%, 90%, 100% { opacity: 1; filter: brightness(1); }
+  95%           { opacity: 0.7; filter: brightness(1.8); }
+}
+@keyframes anim-blink {
+  0%, 49%, 100% { opacity: 1; }
+  50%, 99%      { opacity: 0; }
+}
+@keyframes anim-flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55%                           { opacity: 0.4; }
+}
+@keyframes anim-glow {
+  0%, 100% { filter: drop-shadow(0 0 0px currentColor); }
+  50%       { filter: drop-shadow(0 0 8px currentColor) brightness(1.2); }
+}
+@keyframes anim-ghost {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.35; transform: scale(0.97); }
+}
+@keyframes anim-aurora {
+  0%   { filter: hue-rotate(0deg)   brightness(1); }
+  50%  { filter: hue-rotate(60deg)  brightness(1.15); }
+  100% { filter: hue-rotate(0deg)   brightness(1); }
+}
+@keyframes anim-neon {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 2px currentColor); }
+  50%       { filter: brightness(1.4) drop-shadow(0 0 12px currentColor) drop-shadow(0 0 24px currentColor); }
+}
+
+/* 🔄 回転・軌道系 */
+@keyframes anim-spin-loop {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes anim-orbit {
+  from { transform: rotate(0deg) translateX(12px) rotate(0deg); }
+  to   { transform: rotate(360deg) translateX(12px) rotate(-360deg); }
+}
+@keyframes anim-wobble-loop {
+  0%, 100% { transform: rotate(0deg); }
+  25%       { transform: rotate(5deg) scale(1.04); }
+  75%       { transform: rotate(-5deg) scale(0.96); }
+}
+@keyframes anim-gyroscope {
+  0%   { transform: rotateX(0deg) rotateY(0deg); }
+  25%  { transform: rotateX(15deg) rotateY(90deg); }
+  50%  { transform: rotateX(0deg) rotateY(180deg); }
+  75%  { transform: rotateX(-15deg) rotateY(270deg); }
+  100% { transform: rotateX(0deg) rotateY(360deg); }
+}
+@keyframes anim-rotate-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes anim-compass {
+  0%, 100% { transform: rotate(-10deg); }
+  50%       { transform: rotate(10deg); }
+}
+
+/* 🎯 位置移動系（ループ） */
+@keyframes anim-march {
+  0%, 100% { transform: translateY(0); }
+  25%       { transform: translateY(-4px) translateX(4px); }
+  75%       { transform: translateY(2px) translateX(-2px); }
+}
+@keyframes anim-bounce-loop {
+  0%, 100% { transform: translateY(0); animation-timing-function: ease-in; }
+  40%       { transform: translateY(-18px); animation-timing-function: ease-out; }
+  70%       { transform: translateY(-8px); }
+  85%       { transform: translateY(-3px); }
+}
+@keyframes anim-ping-pong {
+  0%, 100% { transform: translateX(-12px); }
+  50%       { transform: translateX(12px); }
+}
+@keyframes anim-yo-yo {
+  0%, 100% { transform: translateY(-10px); }
+  50%       { transform: translateY(10px); }
+}
+@keyframes anim-figure8 {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(10px, -8px); }
+  50%  { transform: translate(0, 0); }
+  75%  { transform: translate(-10px, -8px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes anim-zigzag {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(8px, -6px); }
+  40%  { transform: translate(16px, 0); }
+  60%  { transform: translate(8px, 6px); }
+  80%  { transform: translate(0, 0); }
+  100% { transform: translate(0, 0); }
+}
+
+/* 💥 強調・アテンション系（ループ） */
+@keyframes anim-attention {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  10%       { transform: scale(1.1) rotate(-3deg); }
+  20%       { transform: scale(1.1) rotate(3deg); }
+  30%       { transform: scale(1.1) rotate(-3deg); }
+  40%       { transform: scale(1.1) rotate(3deg); }
+  50%       { transform: scale(1) rotate(0deg); }
+}
+@keyframes anim-nod {
+  0%, 100% { transform: rotate(0deg); transform-origin: top center; }
+  25%       { transform: rotate(-10deg); transform-origin: top center; }
+  75%       { transform: rotate(5deg);  transform-origin: top center; }
+}
+@keyframes anim-wag {
+  0%, 100% { transform: rotate(0deg); transform-origin: bottom center; }
+  25%       { transform: rotate(15deg);  transform-origin: bottom center; }
+  75%       { transform: rotate(-15deg); transform-origin: bottom center; }
+}
+@keyframes anim-wiggle {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  15%       { transform: translateX(-6px) rotate(-4deg); }
+  30%       { transform: translateX(6px) rotate(4deg); }
+  45%       { transform: translateX(-4px) rotate(-2deg); }
+  60%       { transform: translateX(4px) rotate(2deg); }
+  75%       { transform: translateX(-2px); }
+}
+@keyframes anim-twitch {
+  0%, 80%, 100% { transform: translate(0, 0) rotate(0deg); }
+  82%            { transform: translate(-2px, 1px) rotate(-1deg); }
+  84%            { transform: translate(2px, -1px) rotate(1deg); }
+  86%            { transform: translate(-1px, 2px); }
+  88%            { transform: translate(1px, -1px); }
+}
+
+/* 🌀 変形・モーフ系 */
+@keyframes anim-morph {
+  0%, 100% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; }
+  50%       { border-radius: 60% 40% 30% 70% / 40% 60% 40% 60%; }
+}
+@keyframes anim-squish {
+  0%, 100% { transform: scaleX(1)    scaleY(1); }
+  30%       { transform: scaleX(1.18) scaleY(0.82); }
+  60%       { transform: scaleX(0.86) scaleY(1.14); }
+}
+@keyframes anim-blob {
+  0%, 100% { border-radius: 50%; transform: scale(1); }
+  33%       { border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%; transform: scale(1.04); }
+  66%       { border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%; transform: scale(0.97); }
+}
+
+/* 🌈 色変化系 */
+@keyframes anim-colorshift {
+  0%   { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+@keyframes anim-rainbow {
+  0%   { filter: hue-rotate(0deg)   saturate(1.2); }
+  50%  { filter: hue-rotate(180deg) saturate(1.5); }
+  100% { filter: hue-rotate(360deg) saturate(1.2); }
+}
+@keyframes anim-sunset {
+  0%   { filter: sepia(0) saturate(1); }
+  50%  { filter: sepia(0.5) saturate(1.4) hue-rotate(10deg); }
+  100% { filter: sepia(0) saturate(1); }
+}
+
+/* 🌿 自然現象系 */
+@keyframes anim-wind {
+  0%, 100% { transform: skewX(0deg) scaleX(1); }
+  30%       { transform: skewX(-4deg) scaleX(1.04); }
+  70%       { transform: skewX(3deg) scaleX(0.97); }
+}
+@keyframes anim-ripple {
+  0%   { transform: scale(1);   opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+@keyframes anim-earthquake {
+  0%, 100% { transform: translate(0, 0); }
+  10%       { transform: translate(-4px, -2px); }
+  20%       { transform: translate(4px, 2px); }
+  30%       { transform: translate(-4px, 0); }
+  40%       { transform: translate(4px, -2px); }
+  50%       { transform: translate(-2px, 2px); }
+  60%       { transform: translate(2px, 0); }
+  70%       { transform: translate(-2px, -2px); }
+  80%       { transform: translate(2px, 2px); }
+  90%       { transform: translate(-1px, 1px); }
+}
+
+/* 🤖 メカ・デジタル系 */
+@keyframes anim-glitch {
+  0%, 90%, 100% { transform: translate(0); filter: none; }
+  91% { transform: translate(-3px, 1px); filter: hue-rotate(90deg); }
+  93% { transform: translate(3px, -1px) skewX(3deg); filter: hue-rotate(-90deg) brightness(1.4); }
+  95% { transform: translate(-2px, 0); filter: none; }
+  97% { transform: translate(2px, 2px) skewX(-2deg); filter: hue-rotate(45deg); }
+}
+@keyframes anim-scan {
+  0%   { background-position: 0% -100%; }
+  100% { background-position: 0% 200%; }
+}
+@keyframes anim-electric {
+  0%, 90%, 100% { filter: none; transform: translate(0); }
+  92% { filter: brightness(2) hue-rotate(180deg); transform: translate(-1px, 1px); }
+  94% { filter: brightness(0.5); transform: translate(1px, -1px); }
+  96% { filter: brightness(1.8) hue-rotate(-90deg); transform: translate(-2px, 0); }
+}
+@keyframes anim-matrix {
+  0%   { opacity: 0; transform: translateY(-10px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  90%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(10px); }
+}
+
+/* ── CSS クラス定義 ── */
+
+/* 浮遊・揺れ系 */
+.ca-sway        { animation: anim-sway     2.8s ease-in-out  infinite; transform-origin: bottom center; }
+.ca-hover       { animation: anim-hover    3.2s ease-in-out  infinite; }
+.ca-drift       { animation: anim-drift    6s   ease-in-out  infinite; }
+.ca-seaweed     { animation: anim-seaweed  2.4s ease-in-out  infinite; transform-origin: bottom center; }
+.ca-buoy        { animation: anim-buoy     2.6s ease-in-out  infinite; }
+.ca-cradle      { animation: anim-cradle   2s   ease-in-out  infinite; transform-origin: top center; }
+.ca-pendulum    { animation: anim-pendulum 1.6s ease-in-out  infinite; transform-origin: top center; }
+.ca-leaffall    { animation: anim-leaffall 4s   ease-in-out  infinite; }
+
+/* 拡縮・呼吸系 */
+.ca-breathe     { animation: anim-breathe  3.5s ease-in-out  infinite; }
+.ca-inflate     { animation: anim-inflate  2.8s ease-in-out  infinite; }
+.ca-throb       { animation: anim-throb    1.8s ease-in-out  infinite; }
+.ca-swell       { animation: anim-swell    2.4s ease-in-out  infinite; }
+
+/* 光・透明系 */
+.ca-shimmer     { animation: anim-shimmer  2.5s ease-in-out  infinite; }
+.ca-glimmer     { animation: anim-glimmer  3.5s ease-in-out  infinite; }
+.ca-blink       { animation: anim-blink    1.4s step-end     infinite; }
+.ca-flicker     { animation: anim-flicker  2.8s ease         infinite; }
+.ca-glow        { animation: anim-glow     2.2s ease-in-out  infinite; }
+.ca-ghost       { animation: anim-ghost    3s   ease-in-out  infinite; }
+.ca-aurora      { animation: anim-aurora   5s   ease-in-out  infinite; }
+.ca-neon        { animation: anim-neon     2s   ease-in-out  infinite; }
+
+/* 回転・軌道系 */
+.ca-spin-loop   { animation: anim-spin-loop   6s   linear        infinite; }
+.ca-orbit       { animation: anim-orbit        4s   linear        infinite; }
+.ca-wobble-loop { animation: anim-wobble-loop  2.4s ease-in-out  infinite; }
+.ca-gyroscope   { animation: anim-gyroscope    4s   ease-in-out  infinite; }
+.ca-rotate-slow { animation: anim-rotate-slow 12s   linear        infinite; }
+.ca-compass     { animation: anim-compass      3s   ease-in-out  infinite; }
+
+/* 位置移動系（ループ） */
+.ca-march       { animation: anim-march      2s   ease-in-out  infinite; }
+.ca-bounce-loop { animation: anim-bounce-loop 1.6s ease-in-out  infinite; }
+.ca-ping-pong   { animation: anim-ping-pong   2s   ease-in-out  infinite; }
+.ca-yo-yo       { animation: anim-yo-yo       1.8s ease-in-out  infinite; }
+.ca-figure8     { animation: anim-figure8     3s   ease-in-out  infinite; }
+.ca-zigzag      { animation: anim-zigzag      2.4s ease-in-out  infinite; }
+
+/* 強調・アテンション系 */
+.ca-attention   { animation: anim-attention   3s   ease-in-out  infinite; }
+.ca-nod         { animation: anim-nod         1.6s ease-in-out  infinite; transform-origin: top center; }
+.ca-wag         { animation: anim-wag         1.4s ease-in-out  infinite; transform-origin: bottom center; }
+.ca-wiggle      { animation: anim-wiggle      2.2s ease-in-out  infinite; }
+.ca-twitch      { animation: anim-twitch      4s   ease-in-out  infinite; }
+
+/* 変形・モーフ系 */
+.ca-morph       { animation: anim-morph    4s   ease-in-out  infinite; }
+.ca-squish      { animation: anim-squish   2s   ease-in-out  infinite; }
+.ca-blob        { animation: anim-blob     4s   ease-in-out  infinite; }
+
+/* 色変化系 */
+.ca-colorshift  { animation: anim-colorshift 8s   linear        infinite; }
+.ca-rainbow     { animation: anim-rainbow    6s   ease-in-out  infinite; }
+.ca-sunset      { animation: anim-sunset     5s   ease-in-out  infinite; }
+
+/* 自然現象系 */
+.ca-wind        { animation: anim-wind       3s   ease-in-out  infinite; }
+.ca-ripple      { animation: anim-ripple     1.8s ease-out     infinite; }
+.ca-earthquake  { animation: anim-earthquake 0.8s ease         infinite; }
+
+/* メカ・デジタル系 */
+.ca-glitch      { animation: anim-glitch    4s   step-end     infinite; }
+.ca-electric    { animation: anim-electric  3.5s step-end     infinite; }
+.ca-matrix      { animation: anim-matrix    2s   ease-in-out  infinite; }
